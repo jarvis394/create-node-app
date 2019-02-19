@@ -1,6 +1,12 @@
-const inquirer = require('inquirer');
+require('colors');
 
-module.exports = () => {
+const inquirer = require('inquirer');
+const BottomBar = inquirer.ui.BottomBar;
+const shell = require('shelljs');
+const fs = require('fs-extra');
+const path = require('path');
+
+module.exports = (rootDir, appName, verbose) => {
   return new Promise((resolve, reject) => {
     inquirer.prompt({
       type: 'list',
@@ -13,12 +19,12 @@ module.exports = () => {
         'restify'
       ]
     }).then(answers => {
-      processServer(answers.server)
+      processServer(answers.server, rootDir, appName, verbose, resolve);
     });
   });
 }
 
-function processServer(val) {
+function processServer(val, rootDir, appName, verbose, resolve) {
   let loader = ['/ Installing', '| Installing', '\\ Installing', '- Installing'];
   let i = 4;
   let ui = new BottomBar({
@@ -28,11 +34,10 @@ function processServer(val) {
     ui.updateBottomBar('\n' + loader[i++ % 4] + ` ${val}\n\n`.green);
   }, 100);
 
-  shell.cd(appName)
   shell.exec('npm install ' + val + ' --save', {
     silent: true
   }, (code, stdout, stderr) => {
-    if (verboseFlag) console.log(stdout)
+    if (verbose) console.log(stdout);
 
     if (code !== 0) {
       ui.updateBottomBar('\n');
@@ -45,11 +50,13 @@ function processServer(val) {
 
     ui.updateBottomBar('\n  Successfully installed ' + `${val}`.green + '!\n\n');
     clearInterval(interval);
+    
+    let template = fs.readFileSync('../templates/' + val + '.js');
+    let gitignore = fs.readFileSync('../templates/.gitignore');
+    
+    fs.writeFileSync(path.join(rootDir, 'index.js'), template);
+    fs.writeFileSync(path.join(rootDir, '.gitignore'), gitignore);
 
-    let template = fs.readFileSync('../templates/' + val + '.js')
-
-    fs.writeFileSync(path.join(__dirname, appName, 'index.js'), template);
-
-    process.exit(0)
+    resolve(true);
   });
 }

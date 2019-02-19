@@ -10,16 +10,18 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs-extra');
 
-const BottomBar = inquirer.ui.BottomBar;
-const packageJson = require('./package.json');
+const pkg = require('./package.json');
 
-const program = new commander.Command(packageJson.name)
+const program = new commander.Command(pkg.name)
 
   // Version
   .version(`
   > create-node-app
-  > Current version is ${packageJson.version}
+  > Current version is ${pkg.version}
   `, '-V, --version')
+
+  // Skip
+  .option('-s, --skip', 'Quickly skip everything')
 
   // Verbose
   .option('-v, --verbose', 'Verbose everything')
@@ -57,8 +59,6 @@ if (program.info) {
     .then(console.log);
 }
 
-let verboseFlag = options.verbose;
-
 // Greet
 console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ')
 console.log('      create-node-app:v1.0.0'.gray)
@@ -73,25 +73,15 @@ if (!shell.which('npm')) {
   console.log('[ERROR]'.red + ' "npm" is not installed. ');
   console.log('        Download it here: ' + `https://www.npmjs.com/get-npm`.cyan);
 
-  process.exit(1)
+  process.exit(1);
 }
 
-require('./bin/appName')().then(name => {
+require('./bin/appName')(options.skip).then(name => {
+  require('./bin/npmInit')(options.skip).then(choices => {
 
-  // // Ensure that dir isn't created, then create if not
-  // fs.ensureDirSync(answers.appName);
+    // Ensure that dir isn't created, then create if not
+    fs.ensureDirSync(name.appName);
 
-  // const packageJson = {
-  //   name: answers.appName,
-  //   version: "1.0.0",
-  //   main: "index.js"
-  // };
-  // fs.writeJSON(
-  //   path.join(answers.rootDir, 'package.json'),
-  //   packageJson + os.EOL
-  // );
-
-  require('./bin/npmInit')().then(choices => {
     if (choices) {
 
       let packageJson = {
@@ -115,14 +105,27 @@ require('./bin/appName')().then(name => {
       } = choices;
 
       if (newName) packageJson.name = newName;
+      if (description) packageJson.description = description;
+      if (scripts) packageJson.scripts = scripts;
+      if (author) packageJson.author = author;
+
+      // Write package.json
+      fs.writeJSON(
+        path.join(name.rootDir, 'package.json'),
+        packageJson
+      );
 
     } else {
+
+      shell.cd(name.rootDir);
       shell.exec('npm init -y', {
         silent: true
       });
+
     }
-    require('./bin/processServer')().then(() => {
-      require('./bin/postInstall')()
+    
+    require('./bin/processServer')(name.rootDir, name.appName, options.verbose).then(() => {
+      require('./bin/postInstall')(name.appName)
     });
   });
 });

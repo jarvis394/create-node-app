@@ -1,34 +1,36 @@
 {
-  "main": "create-node-app.js",
   "name": "create-node-app",
   "version": "1.0.0",
+  "description": "Create Node.JS app in just 2 clicks!",
+  "main": "create-node-app.js",
+  "bin": {
+    "create-node-app": "appName.js"
+  },
+  "scripts": {
+    "start": "node .",
+    "test": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarvis394/create-node-app.git"
+  },
+  "author": "jarvis394",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jarvis394/create-node-app/issues"
+  },
+  "homepage": "https://github.com/jarvis394/create-node-app#readme",
   "dependencies": {
-    "cmdify": "^0.0.4",
     "colors": "^1.3.3",
     "commander": "^2.19.0",
     "envinfo": "^7.0.0",
-    "eslint": "^5.14.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "express": "^4.16.4",
-    "fs": "^0.0.1-security",
     "fs-extra": "^7.0.1",
-    "hapi": "^18.1.0",
     "inquirer": "^6.2.2",
     "inquirer-npm-name": "^3.0.0",
-    "koa": "^2.7.0",
+    "npm-name": "^5.1.0",
+    "os": "^0.1.1",
     "path": "^0.12.7",
-    "restify": "^7.7.0",
     "shelljs": "^0.8.3",
     "validate-npm-package-name": "^3.0.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "start": "node ./create-node-app.js",
-    "test": "jest --verbose"
-  },
-  "keywords": [],
-  "author": "jarvis394",
-  "license": "ISC",
-  "description": "Create node app in just 2 clicks!"
+  }
 }
