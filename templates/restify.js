@@ -1,15 +1,15 @@
-const restify = require('restify');
-const PORT = process.env.PORT || 4000;
+const restify = require('restify')
+const PORT = process.env.PORT || 4000
 
 const respond = (req, res, next) => {
-  res.send('Hello ' + req.params.name);
+  res.send('Hello ' + req.params.name)
   
-  next();
+  next()
 }
 
-var server = restify.createServer();
-server.get('/hello/:name', respond);
+var server = restify.createServer()
+server.get('/hello/:name', respond)
 
 server.listen(PORT, () => {
-  console.log('Running at ' + PORT);
-});
+  console.log('Running at ' + PORT)
+})
